@@ -1,22 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "BattleTank.h"
+#include "Tank.h"
 #include "TankPlayerController.h"
 
 void ATankPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
-	ATank* controlledTank = GetControlledTank();
-	if( controlledTank == NULL )
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Player Controller Not In Control Of Any Tank"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Player Controller In Control Of %s"), *controlledTank->GetName());
-
-	}
 }
 
 void ATankPlayerController::Tick(float DeltaTime)
@@ -38,7 +28,7 @@ void ATankPlayerController::AimTowardsCrosshair()
 	FVector HitLocation;
 	if (GetSightRayHitLocation(HitLocation))
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("HitLocation: %s"), *HitLocation.ToString());
+		GetControlledTank()->AimAt(HitLocation);
 
 	}
 }
@@ -72,13 +62,12 @@ bool ATankPlayerController::GetLookVectorHitLocation(FVector &HitLocation, FVect
 	if (GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility))
 	{
 		HitLocation = HitResult.Location;
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *HitLocation.ToString());
+		//UE_LOG(LogTemp, Warning, TEXT("%s"), *HitLocation.ToString());
 		return true;
 	}
 	else
 		return false;
 }
-
 
 
 
