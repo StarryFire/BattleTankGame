@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Kartik TankGame Ltd.
 
 #pragma once
 
