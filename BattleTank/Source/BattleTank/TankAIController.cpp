@@ -1,7 +1,7 @@
 // Kartik TankGame Ltd.
 
 #include "BattleTank.h"
-#include "Tank.h"
+#include "TankAimingComponent.h"
 #include "TankAIController.h"
 
 void ATankAIController::BeginPlay()
@@ -12,14 +12,16 @@ void ATankAIController::BeginPlay()
 void ATankAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	ATank* PlayerTank = (ATank*)GetWorld()->GetFirstPlayerController()->GetPawn();
-	ATank* ControlledTank = (ATank*)GetPawn();
 
-	if (PlayerTank)
-	{
-		MoveToActor(PlayerTank, AcceptanceRadius);
+	if (!ensure(GetPawn()))
+		return;
+	auto TankAimingComponent = GetPawn()->FindComponentByClass<UTankAimingComponent>();
+	APawn* PlayerTank = GetWorld()->GetFirstPlayerController()->GetPawn();            //TODO Protect pointers returned by GetWorld() and GetFirstPlayerController()
 
-		ControlledTank->AimAt(PlayerTank->GetActorLocation());
-		ControlledTank->Fire();
-	}
+	if (!ensure(PlayerTank && TankAimingComponent))
+		return;
+	
+	MoveToActor(PlayerTank, AcceptanceRadius);
+	TankAimingComponent->AimAt(PlayerTank->GetActorLocation());
+	TankAimingComponent->Fire();
 }
