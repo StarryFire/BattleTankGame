@@ -36,7 +36,8 @@ void ATankPlayerController::AimTowardsCrosshair()
 		return;
 
 	FVector HitLocation;
-	if (GetSightRayHitLocation(HitLocation))
+	bool bGotHitLocation = GetSightRayHitLocation(HitLocation);
+	if (bGotHitLocation)
 	{
 		TankAimingComponent->AimAt(HitLocation);
 	}
@@ -49,10 +50,10 @@ bool ATankPlayerController::GetSightRayHitLocation(FVector &HitLocation) const
 	FVector2D ScreenLocation = FVector2D(ViewportSizeX*CrossHairXLocation, ViewportSizeY*CrossHairYLocation);
 	
 	FVector LookDirection;
-	GetLookDirection(ScreenLocation, LookDirection);
-	GetLookVectorHitLocation(HitLocation, LookDirection);
-
-	return true;
+	if(GetLookDirection(ScreenLocation, LookDirection))
+		return GetLookVectorHitLocation(HitLocation, LookDirection);
+	else
+		return false;
 }
 
 bool ATankPlayerController::GetLookDirection(FVector2D ScreenLocation, FVector &LookDirection) const

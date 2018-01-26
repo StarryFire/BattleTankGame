@@ -10,7 +10,8 @@ enum class EFiringState : uint8
 {
 	Reloading,
 	Aiming,
-	Locked
+	Locked,
+	Empty
 };
 
 
@@ -29,28 +30,23 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(BlueprintReadOnly, Category = "State")
-	EFiringState FiringState = EFiringState::Locked;
+		EFiringState FiringState = EFiringState::Aiming;
 
 public:	
 	UTankBarrel* Barrel = nullptr;
 	UTankTurret* Turret = nullptr;
+
+	double LastFireTime = 0;
+	FVector AimDirection;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Firing")
+		int Ammo = 3;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Firing")
+		int CurrentAmmo;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Firing")
 		float LaunchSpeed = 2000;
-
-	UFUNCTION(BlueprintCallable, Category = "Setup")
-		void Initialize(UTankBarrel* BarrelToSet, UTankTurret* TurretToSet);
-
-	// Sets default values for this component's properties
-	UTankAimingComponent();
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	
-	void MoveBarrel(FVector AimDirection);
-	void AimAt(FVector HitLocation);
-	
-	UFUNCTION(BlueprintCallable, Category = "Firing")  //For the corresponding Blueprint class of the C++ class to call this function, the function must be public/protected cuz the blueprint class is actually a subclass of the corresponding C++ class
-		void Fire();
 
 	UPROPERTY(EditDefaultsOnly, Category = "Firing")
 		TSubclassOf<AProjectile> ProjectileBlueprint;
@@ -58,5 +54,18 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Firing")
 		float ReloadTime = 3.0;
 
-	double LastFireTime = 0;
+	UFUNCTION(BlueprintCallable, Category = "Setup")
+		void Initialize(UTankBarrel* BarrelToSet, UTankTurret* TurretToSet);
+
+	UFUNCTION(BlueprintCallable, Category = "Firing")  //For the corresponding Blueprint class of the C++ class to call this function, the function must be public/protected cuz the blueprint class is actually a subclass of the corresponding C++ class
+		void Fire();
+
+	// Sets default values for this component's properties
+	UTankAimingComponent();
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	EFiringState GetFiringState();
+	void MoveBarrel();
+	void AimAt(FVector HitLocation);
+	bool IsBarrelMoving();
 };
